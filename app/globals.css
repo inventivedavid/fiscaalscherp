@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  @apply bg-white text-ink-900;
+}
+
+/* Focus rings: visible op keyboard, onzichtbaar bij muis. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid theme('colors.gold.500');
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Utility: subtiele noise voor hero-backgrounds. */
+.bg-noise {
+  background-image:
+    radial-gradient(1200px 600px at 80% -10%, rgba(227, 168, 69, 0.18), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(37, 58, 104, 0.25), transparent 55%);
+}
+
+.prose-custom p {
+  @apply text-ink-700 leading-relaxed;
+}
