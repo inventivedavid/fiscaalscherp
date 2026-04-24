@@ -229,32 +229,30 @@ export function ReportDocument({
 
         <View style={{ marginTop: 40 }}>
           <Text style={styles.h3}>In dit rapport</Text>
-          <Text style={styles.muted}>
-            1. Managementsamenvatting
-          </Text>
+          <Text style={styles.muted}>1. Samenvatting</Text>
           <Text style={styles.muted}>2. Bevindingen in detail</Text>
           <Text style={styles.muted}>3. Prioriteringsmatrix</Text>
-          <Text style={styles.muted}>4. Vervolgstappen</Text>
-          <Text style={styles.muted}>5. Over ons en disclaimer</Text>
+          <Text style={styles.muted}>4. Vervolgmogelijkheden</Text>
+          <Text style={styles.muted}>5. Methodologie en disclaimer</Text>
         </View>
 
         <Footer clientName={firstName} />
       </Page>
 
-      {/* 1. MANAGEMENTSAMENVATTING */}
+      {/* 1. SAMENVATTING */}
       <Page size="A4" style={styles.page}>
-        <Text style={styles.brand}>1 · Managementsamenvatting</Text>
-        <Text style={styles.h1}>Wat we hebben gevonden</Text>
+        <Text style={styles.brand}>1 · Samenvatting</Text>
+        <Text style={styles.h1}>Diagnose</Text>
 
         <View style={{ flexDirection: "row", marginTop: 18, gap: 10 }}>
           <View style={[styles.card, { flex: 1 }]}>
-            <Text style={styles.muted}>Optimalisatiepunten gevonden</Text>
+            <Text style={styles.muted}>Aandachtspunten gesignaleerd</Text>
             <Text style={{ fontSize: 32, fontFamily: "Helvetica-Bold" }}>
               {findings.length}
             </Text>
           </View>
           <View style={[styles.card, { flex: 1, backgroundColor: COLORS.goldSoft }]}>
-            <Text style={styles.muted}>Indicatieve jaarlijkse besparing</Text>
+            <Text style={styles.muted}>Indicatieve jaarlijkse bandbreedte</Text>
             <Text
               style={{
                 fontSize: 22,
@@ -267,7 +265,7 @@ export function ReportDocument({
           </View>
         </View>
 
-        <Text style={styles.h2}>De grootste kans in jouw situatie</Text>
+        <Text style={styles.h2}>Meest significante bevinding</Text>
         {findings[0] ? (
           <View>
             <Text style={styles.h3}>{findings[0].title}</Text>
@@ -275,20 +273,23 @@ export function ReportDocument({
           </View>
         ) : (
           <Text style={styles.muted}>
-            Er zijn geen directe optimalisatiepunten aangetroffen op basis van je
-            antwoorden. Dat kan wijzen op een al sterk ingerichte structuur, of op
-            een beperking van een snelle scan. Een gesprek van 30 minuten geeft
-            altijd meer uitsluitsel.
+            De engine heeft op basis van de opgegeven gegevens geen directe
+            aandachtspunten gesignaleerd. Dit betekent dat de structuur op de
+            gemeten indicatoren geen rode vlaggen afgeeft — het betekent niet dat
+            er niets te optimaliseren valt. Een volledige beoordeling met een
+            adviseur die de hele context kent, kan dieper gaan dan een
+            geautomatiseerde toets.
           </Text>
         )}
 
-        <Text style={styles.h2}>Hoe je dit rapport leest</Text>
+        <Text style={styles.h2}>Leeswijzer</Text>
         <Text style={styles.muted}>
-          Elke bevinding komt met een toelichting, een indicatieve besparingsrange
-          en een complexiteitsinschatting. De prioriteringsmatrix achterin helpt je
-          om te beslissen waar je als eerste mee aan de slag wilt. Alle bedragen
-          zijn indicatief — concreet advies vereist een volledig beeld van je
-          situatie.
+          Elke bevinding wordt gepresenteerd met een toelichting, een
+          indicatieve bandbreedte en een complexiteitsinschatting. De
+          prioriteringsmatrix ordent de bevindingen op impact tegen
+          complexiteit. Alle bedragen zijn indicatief en gebaseerd op de
+          opgegeven ranges — implementatie vereist gesprek met een adviseur die
+          de volledige context kent.
         </Text>
 
         <Footer clientName={firstName} />
@@ -375,60 +376,86 @@ export function ReportDocument({
         </Page>
       ) : null}
 
-      {/* 4. VERVOLGSTAPPEN */}
+      {/* 4. VERVOLGMOGELIJKHEDEN */}
       <Page size="A4" style={styles.page}>
-        <Text style={styles.brand}>4 · Vervolgstappen</Text>
-        <Text style={styles.h1}>Wat je nu kunt doen</Text>
+        <Text style={styles.brand}>4 · Vervolgmogelijkheden</Text>
+        <Text style={styles.h1}>Opties</Text>
+
+        <Text style={[styles.muted, { marginBottom: 16 }]}>
+          Dit rapport kan zelfstandig worden gelezen en is geschikt om met een
+          bestaande adviseur te bespreken. Wie de bevindingen op het platform
+          zelf wil doorwerken, heeft vier lagen ter beschikking:
+        </Text>
 
         <View style={styles.card}>
-          <Text style={styles.h3}>Optie 1 — Gratis bespreking (30 minuten)</Text>
+          <Text style={styles.h3}>Scan · Gratis</Text>
           <Text>
-            We lopen dit rapport telefonisch met je door en beantwoorden je
-            vragen. Geen verkoopgesprek — echt even samen naar de bevindingen
-            kijken. Plan een moment dat je uitkomt:
-          </Text>
-          <Text style={{ color: COLORS.gold, marginTop: 4 }}>{SITE.calUrl}</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.h3}>Optie 2 — Fiscale Optimalisatiesessie · € 495</Text>
-          <Text>
-            90 minuten diepgaand gesprek met uitgewerkt adviesrapport en concrete
-            implementatiestappen. Geen doorlopende relatie vereist. Dit is de
-            logische vervolgstap als je de bevindingen concreet wilt uitwerken.
+            Huidig rapport. Jaarlijks herhalen is zinvol om veranderingen in de
+            positie te meten.
           </Text>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.h3}>
-            Optie 3 — Jaaroptimalisatie-abonnement · vanaf € 95 / maand
-          </Text>
+          <Text style={styles.h3}>Optimalisatiesessie · € 495 eenmalig</Text>
           <Text>
-            Kwartaalcheck op je fiscale positie, proactieve signalering bij
-            wetswijzigingen, onbeperkte korte vragen per e-mail. Los van je
-            huidige boekhouding — precies die proactieve laag die nu ontbreekt.
+            90 minuten diepgaand gesprek met uitgewerkt schriftelijk advies
+            binnen 5 werkdagen. Geen doorlopende verplichting.
           </Text>
         </View>
+
+        <View style={styles.card}>
+          <Text style={styles.h3}>Jaaroptimalisatie · € 95 / maand</Text>
+          <Text>
+            Kwartaalreview fiscale positie, signalering bij wetswijzigingen,
+            onbeperkte korte vragen per e-mail. Los van de huidige boekhouding.
+          </Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.h3}>Volledige administratie · € 295 / maand</Text>
+          <Text>
+            Boekhouding, aangiftes en proactief advies in één aanpak. Start
+            uitsluitend na kennismaking.
+          </Text>
+        </View>
+
+        <Text style={[styles.muted, { marginTop: 14 }]}>
+          Kosteloze kennismaking (30 minuten, geen verplichting): {SITE.calUrl}
+        </Text>
 
         <Footer clientName={firstName} />
       </Page>
 
-      {/* 5. DISCLAIMER */}
+      {/* 5. METHODOLOGIE / DISCLAIMER */}
       <Page size="A4" style={styles.page}>
-        <Text style={styles.brand}>5 · Over dit rapport</Text>
-        <Text style={styles.h1}>Disclaimer en voorwaarden</Text>
+        <Text style={styles.brand}>5 · Methodologie & disclaimer</Text>
+        <Text style={styles.h1}>Over dit rapport</Text>
         <Text style={styles.muted}>
-          Dit rapport is een geautomatiseerde indicatie op basis van de door jou
-          verstrekte antwoorden. Het vervangt geen fiscaal advies. De genoemde
-          besparingen zijn indicatieve ranges en afhankelijk van je volledige
-          fiscale situatie. Voor concrete implementatie is nader onderzoek en
-          persoonlijk advies vereist. Tarieven en regelingen (zoals gebruikelijk
-          loon, box 2, BOR, innovatiebox, Wet excessief lenen) zijn gebaseerd op
-          openbare bronnen en regelgeving zoals die bekend was op het moment van
-          opstellen van dit rapport; wetswijzigingen kunnen van invloed zijn.
+          Dit rapport is opgesteld door een geautomatiseerde engine op basis
+          van de opgegeven antwoorden. De engine toetst tegen de actuele Wet
+          IB, Wet VPB, Wet LB (art. 12a), Wet excessief lenen, Besluit
+          bedrijfsopvolging, en relevante Kennisgroep-standpunten. Peildatum
+          voor tarieven en normen: kalenderjaar ten tijde van het opstellen.
         </Text>
-        <Text style={[styles.muted, { marginTop: 10 }]}>
-          {SITE.brand} · Contact: {SITE.contactEmail}
+
+        <Text style={[styles.h3, { marginTop: 18 }]}>Indicatief karakter</Text>
+        <Text style={styles.muted}>
+          Alle bedragen zijn bandbreedtes, geen puntschattingen. De
+          werkelijkheid hangt af van factoren die buiten deze geautomatiseerde
+          toets vallen (volledige fiscale historie, privé-situatie, specifieke
+          sectorregelingen). Implementatie vereist altijd betrokkenheid van een
+          adviseur die de volledige context kent. Dit rapport vormt geen
+          fiscaal advies in de zin van art. 53 AWR.
+        </Text>
+
+        <Text style={[styles.h3, { marginTop: 14 }]}>Open methodologie</Text>
+        <Text style={styles.muted}>
+          De methodologie van de engine is openbaar en reproduceerbaar.
+          Uitgebreide beschrijving: {SITE.url}/methodologie
+        </Text>
+
+        <Text style={[styles.muted, { marginTop: 18 }]}>
+          {SITE.brand} · {SITE.contactEmail}
           {SITE.kvkNumber ? ` · KvK ${SITE.kvkNumber}` : ""}
         </Text>
 

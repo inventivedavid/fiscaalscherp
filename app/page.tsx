@@ -1,38 +1,27 @@
-import { Nav } from "@/components/Nav";
-import { Hero } from "@/components/Hero";
-import { ProblemRecognition } from "@/components/ProblemRecognition";
-import { Solution } from "@/components/Solution";
-import { HowItWorks } from "@/components/HowItWorks";
-import { WhatYouGet } from "@/components/WhatYouGet";
-import { SocialProof } from "@/components/SocialProof";
-import { AboutMaker } from "@/components/AboutMaker";
-import { FAQ } from "@/components/FAQ";
-import { FinalCTA } from "@/components/FinalCTA";
-import { Footer } from "@/components/Footer";
+import { Nav } from "@/components/platform/Nav";
+import { Hero } from "@/components/platform/Hero";
+import { StatsStrip } from "@/components/platform/StatsStrip";
+import { ProductMap } from "@/components/platform/ProductMap";
+import { Methodology } from "@/components/platform/Methodology";
+import { PricingBlock } from "@/components/platform/PricingBlock";
+import { FAQ } from "@/components/platform/FAQ";
+import { ClosingCTA } from "@/components/platform/ClosingCTA";
+import { Footer } from "@/components/platform/Footer";
 
-// Hero A/B-variant via URL: ?v=a | b | c
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ v?: string }>;
-}) {
-  const { v } = await searchParams;
-  const variant: "a" | "b" | "c" =
-    v === "a" || v === "c" ? v : "b";
+export const revalidate = 120;
 
+export default function HomePage() {
   return (
     <>
       <Nav />
       <main>
-        <Hero variant={variant} />
-        <ProblemRecognition />
-        <Solution />
-        <HowItWorks />
-        <WhatYouGet />
-        <SocialProof />
-        <AboutMaker />
+        <Hero />
+        <StatsStrip />
+        <ProductMap />
+        <Methodology />
+        <PricingBlock />
         <FAQ />
-        <FinalCTA />
+        <ClosingCTA />
       </main>
       <Footer />
     </>

@@ -4,35 +4,52 @@
 
 :root {
   color-scheme: light;
+  --scroll-padding: 80px;
 }
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--scroll-padding);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "cv11";
 }
 
 body {
-  @apply bg-white text-ink-900;
+  @apply bg-canvas text-ink;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Focus rings: visible op keyboard, onzichtbaar bij muis. */
+/* Display font gets optical correction for better weight distribution. */
+.font-display {
+  font-feature-settings: "ss01" on;
+}
+
+/* Focus rings: rustig, alleen zichtbaar bij keyboard-navigatie. */
 :focus:not(:focus-visible) {
   outline: none;
 }
 :focus-visible {
-  outline: 2px solid theme('colors.gold.500');
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: 2px solid theme('colors.ink.DEFAULT');
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
-/* Utility: subtiele noise voor hero-backgrounds. */
-.bg-noise {
-  background-image:
-    radial-gradient(1200px 600px at 80% -10%, rgba(227, 168, 69, 0.18), transparent 60%),
-    radial-gradient(900px 500px at -10% 10%, rgba(37, 58, 104, 0.25), transparent 55%);
+/* Hairline top-border utility voor sections die "papier" indruk geven. */
+.hairline-t {
+  border-top: 1px solid theme('colors.line.DEFAULT');
+}
+.hairline-b {
+  border-bottom: 1px solid theme('colors.line.DEFAULT');
 }
 
-.prose-custom p {
-  @apply text-ink-700 leading-relaxed;
+/* Getal-tabel-stijl voor data-dichte panelen (numerieke uitlijning). */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle dot-grid voor sommige backgrounds — institutioneel papier-gevoel. */
+.bg-dot-grid {
+  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
 }

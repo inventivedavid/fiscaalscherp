@@ -12,12 +12,8 @@ import {
 
 const STORAGE_KEY = "dga_scan_draft_v1";
 
-// Type helper: het interne antwoordobject gebruikt losse strings tijdens bewerken.
 type AnswerState = Partial<Record<keyof Answers, string>>;
 
-// ────────────────────────────────────────────────────────────────
-// Stappen: eerst één vraag per scherm (commitment-psych), dan contact.
-// ────────────────────────────────────────────────────────────────
 function useScanState() {
   const [answers, setAnswers] = useState<AnswerState>({});
   const [stepIndex, setStepIndex] = useState(0);
@@ -63,7 +59,6 @@ function useScanState() {
   return { answers, setAnswers, stepIndex, setStepIndex, hydrated, reset };
 }
 
-// ────────────────────────────────────────────────────────────────
 function TerminationScreen({
   title,
   message,
@@ -74,19 +69,19 @@ function TerminationScreen({
   onRestart: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-xl rounded-xl border border-ink-200 bg-white p-10 text-center shadow-soft">
-      <h2 className="text-2xl font-bold text-ink-900">{title}</h2>
-      <p className="mt-4 text-ink-700">{message}</p>
-      <div className="mt-8 flex justify-center gap-3">
+    <div className="mx-auto max-w-xl rounded-2xl border border-line bg-canvas-50 p-10 text-center shadow-card">
+      <h2 className="font-display text-3xl text-ink">{title}</h2>
+      <p className="mt-4 text-base leading-relaxed text-ink-soft">{message}</p>
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <button
           onClick={onRestart}
-          className="rounded-md border border-ink-200 px-4 py-2 text-sm font-semibold text-ink-800 hover:bg-ink-50"
+          className="rounded-full border border-line bg-canvas px-5 py-2.5 text-sm text-ink hover:bg-canvas-100"
         >
           Scan opnieuw starten
         </button>
         <Link
           href="/"
-          className="rounded-md bg-ink-900 px-4 py-2 text-sm font-semibold text-white hover:bg-ink-800"
+          className="rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas hover:bg-ink-soft"
         >
           Terug naar home
         </Link>
@@ -95,7 +90,6 @@ function TerminationScreen({
   );
 }
 
-// ────────────────────────────────────────────────────────────────
 export function ScanForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -113,13 +107,11 @@ export function ScanForm() {
   const { answers, setAnswers, stepIndex, setStepIndex, hydrated, reset } =
     useScanState();
 
-  // Bepaal dynamisch de zichtbare vragen o.b.v. conditionele logic.
   const visible: QuestionBase[] = useMemo(
     () => visibleQuestions(answers as Partial<Answers>),
     [answers],
   );
 
-  // Totaal aantal stappen = zichtbare vragen + 1 contact-stap.
   const totalSteps = visible.length + 1;
   const clampedIndex = Math.min(stepIndex, totalSteps - 1);
   const isContactStep = clampedIndex === visible.length;
@@ -132,7 +124,6 @@ export function ScanForm() {
     message: string;
   } | null>(null);
 
-  // Focus management voor toegankelijkheid.
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     headingRef.current?.focus();
@@ -140,7 +131,7 @@ export function ScanForm() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center text-ink-500">
+      <div className="flex min-h-[400px] items-center justify-center text-ink-muted">
         <p>Scan wordt geladen…</p>
       </div>
     );
@@ -158,7 +149,6 @@ export function ScanForm() {
     );
   }
 
-  // ── Handlers ────────────────────────────────────────────────
   function setAnswer(key: keyof Answers, value: string) {
     setAnswers((a) => ({ ...a, [key]: value }));
   }
@@ -198,7 +188,7 @@ export function ScanForm() {
       email: String(formData.get("email") ?? "").trim(),
       phone: String(formData.get("phone") ?? "").trim(),
       consent: formData.get("consent") === "on" ? "true" : "",
-      website: String(formData.get("website") ?? ""), // honeypot
+      website: String(formData.get("website") ?? ""),
       hero_variant: heroVariant,
       utm_source: utm.utm_source,
       utm_medium: utm.utm_medium,
@@ -236,18 +226,15 @@ export function ScanForm() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Progress header */}
-      <div className="mb-6 flex items-center justify-between text-sm">
-        <span className="font-semibold text-ink-500">
-          Stap {clampedIndex + 1} van {totalSteps}
+      <div className="mb-4 flex items-center justify-between text-xs font-medium uppercase tracking-eyebrow">
+        <span className="text-ink-muted tabular-nums">
+          Stap {clampedIndex + 1} / {totalSteps}
         </span>
-        <span className="text-ink-500">
-          {blockInfo?.title ?? ""}
-        </span>
+        <span className="text-ink-muted">{blockInfo?.title ?? ""}</span>
       </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-ink-100">
+      <div className="h-px w-full overflow-hidden bg-line">
         <div
-          className="h-full rounded-full bg-gold-500 transition-[width] duration-300"
+          className="h-full bg-ink transition-[width] duration-300"
           style={{ width: `${progress}%` }}
           role="progressbar"
           aria-valuenow={progress}
@@ -256,7 +243,7 @@ export function ScanForm() {
         />
       </div>
 
-      <div className="mt-10 rounded-xl border border-ink-100 bg-white p-8 shadow-soft md:p-10">
+      <div className="mt-8 rounded-2xl border border-line bg-canvas-50 p-8 shadow-card md:p-10">
         {isContactStep ? (
           <ContactStep
             onSubmit={handleSubmit}
@@ -278,14 +265,13 @@ export function ScanForm() {
         ) : null}
       </div>
 
-      <p className="mt-6 text-center text-xs text-ink-500">
-        Uw voortgang wordt automatisch bewaard op dit apparaat.
+      <p className="mt-5 text-center text-xs text-ink-subtle">
+        Je voortgang wordt automatisch bewaard op dit apparaat.
       </p>
     </div>
   );
 }
 
-// ────────────────────────────────────────────────────────────────
 function QuestionStep({
   question,
   value,
@@ -308,12 +294,12 @@ function QuestionStep({
       <h2
         ref={headingRef}
         tabIndex={-1}
-        className="text-2xl font-bold text-ink-900 outline-none md:text-3xl"
+        className="font-display text-2xl text-ink outline-none md:text-3xl"
       >
         {question.label}
       </h2>
       {question.help ? (
-        <p className="mt-2 text-ink-600">{question.help}</p>
+        <p className="mt-3 text-base text-ink-muted">{question.help}</p>
       ) : null}
 
       <div className="mt-8 space-y-2.5">
@@ -325,10 +311,10 @@ function QuestionStep({
               key={opt.value}
               htmlFor={id}
               className={[
-                "flex cursor-pointer items-center gap-4 rounded-lg border p-4 transition",
+                "flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition",
                 checked
-                  ? "border-gold-500 bg-gold-50"
-                  : "border-ink-200 bg-white hover:border-ink-300 hover:bg-ink-50",
+                  ? "border-ink bg-canvas"
+                  : "border-line bg-canvas hover:border-line-strong hover:bg-canvas",
               ].join(" ")}
             >
               <input
@@ -338,12 +324,14 @@ function QuestionStep({
                 value={opt.value}
                 checked={checked}
                 onChange={(e) => onChange(e.target.value)}
-                className="size-4 accent-gold-600"
+                className="mt-0.5 size-4 accent-ink"
               />
               <span className="flex-1">
-                <span className="block font-medium text-ink-900">{opt.label}</span>
+                <span className="block text-sm font-medium text-ink">
+                  {opt.label}
+                </span>
                 {opt.hint ? (
-                  <span className="mt-0.5 block text-xs text-ink-500">
+                  <span className="mt-0.5 block text-xs text-ink-subtle">
                     {opt.hint}
                   </span>
                 ) : null}
@@ -354,7 +342,7 @@ function QuestionStep({
       </div>
 
       {error ? (
-        <p className="mt-4 text-sm text-red-600" role="alert">
+        <p className="mt-4 text-sm text-accent-700" role="alert">
           {error}
         </p>
       ) : null}
@@ -364,7 +352,7 @@ function QuestionStep({
           <button
             type="button"
             onClick={onBack}
-            className="text-sm font-semibold text-ink-600 hover:text-ink-900"
+            className="text-sm text-ink-muted hover:text-ink"
           >
             ← Vorige
           </button>
@@ -374,16 +362,15 @@ function QuestionStep({
         <button
           type="button"
           onClick={onNext}
-          className="rounded-md bg-ink-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-ink-800"
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-medium text-canvas transition hover:bg-ink-soft"
         >
-          Volgende →
+          Volgende
         </button>
       </div>
     </>
   );
 }
 
-// ────────────────────────────────────────────────────────────────
 function ContactStep({
   onSubmit,
   onBack,
@@ -402,19 +389,18 @@ function ContactStep({
       <h2
         ref={headingRef}
         tabIndex={-1}
-        className="text-2xl font-bold text-ink-900 outline-none md:text-3xl"
+        className="font-display text-2xl text-ink outline-none md:text-3xl"
       >
-        Laatste stap — waar sturen we uw rapport naartoe?
+        Waar sturen we je rapport naartoe?
       </h2>
-      <p className="mt-2 text-ink-600">
-        We gebruiken uw gegevens alleen om het rapport te versturen en uw situatie
-        te begrijpen. Nooit gedeeld met derden.
+      <p className="mt-3 text-base text-ink-muted">
+        Enkel nodig om het persoonlijke rapport te versturen. Geen commerciële doorverkoop, geen deling met derden. Uitschrijven uit eventuele vervolg-mails gaat met één klik.
       </p>
 
       <div className="mt-8 grid gap-5 md:grid-cols-2">
         <Field
           name="full_name"
-          label="Uw naam"
+          label="Naam"
           autoComplete="name"
           required
           placeholder="Voornaam Achternaam"
@@ -424,7 +410,7 @@ function ContactStep({
           label="Bedrijfsnaam"
           autoComplete="organization"
           required
-          placeholder="Uw BV"
+          placeholder="Je BV"
         />
         <Field
           name="email"
@@ -432,7 +418,7 @@ function ContactStep({
           label="E-mailadres"
           autoComplete="email"
           required
-          placeholder="u@bedrijf.nl"
+          placeholder="je@bedrijf.nl"
         />
         <Field
           name="phone"
@@ -451,27 +437,29 @@ function ContactStep({
         </label>
       </div>
 
-      <label className="mt-6 flex items-start gap-3 text-sm text-ink-700">
+      <label className="mt-6 flex items-start gap-3 text-sm text-ink-soft">
         <input
           type="checkbox"
           name="consent"
           required
-          className="mt-1 size-4 accent-gold-600"
+          className="mt-1 size-4 accent-ink"
         />
         <span>
-          Ik ga akkoord met{" "}
-          <Link href="/privacy" className="underline hover:text-ink-900">
-            het privacybeleid
+          Ik ga akkoord met het{" "}
+          <Link
+            href="/privacy"
+            className="underline decoration-line underline-offset-4 hover:decoration-ink"
+          >
+            privacybeleid
           </Link>{" "}
-          en begrijp dat de bevindingen in dit rapport indicatief zijn en geen
-          fiscaal advies vormen.
+          en begrijp dat de bevindingen indicatief zijn en geen fiscaal advies vormen.
         </span>
       </label>
 
       {error ? (
         <div
           role="alert"
-          className="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          className="mt-6 rounded-lg border border-accent-300 bg-accent-50 p-4 text-sm text-accent-700"
         >
           {error}
         </div>
@@ -481,7 +469,7 @@ function ContactStep({
         <button
           type="button"
           onClick={onBack}
-          className="text-sm font-semibold text-ink-600 hover:text-ink-900"
+          className="text-sm text-ink-muted hover:text-ink disabled:opacity-50"
           disabled={submitting}
         >
           ← Vorige
@@ -489,11 +477,9 @@ function ContactStep({
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-gold-500 px-7 py-3 text-sm font-semibold text-ink-900 transition hover:bg-gold-400 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-medium text-canvas transition hover:bg-ink-soft disabled:opacity-60"
         >
-          {submitting
-            ? "Rapport wordt aangemaakt…"
-            : "Stuur mijn persoonlijke rapport →"}
+          {submitting ? "Rapport wordt aangemaakt…" : "Stuur mijn rapport"}
         </button>
       </div>
     </form>
@@ -517,9 +503,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-semibold text-ink-800">
+      <span className="mb-1.5 block text-xs font-medium uppercase tracking-eyebrow text-ink-muted">
         {label}
-        {required ? <span className="text-gold-600"> *</span> : null}
+        {required ? <span className="text-accent-500"> *</span> : null}
       </span>
       <input
         type={type}
@@ -527,7 +513,7 @@ function Field({
         required={required}
         autoComplete={autoComplete}
         placeholder={placeholder}
-        className="block w-full rounded-md border border-ink-200 bg-white px-4 py-3 text-ink-900 placeholder:text-ink-400 focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/30"
+        className="block w-full rounded-lg border border-line bg-canvas px-4 py-3 text-sm text-ink placeholder:text-ink-subtle focus:border-ink focus:outline-none"
       />
     </label>
   );

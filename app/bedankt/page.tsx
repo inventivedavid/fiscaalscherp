@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Bedankt — uw rapport is onderweg",
+  title: "Rapport is onderweg",
   robots: { index: false, follow: false },
 };
 
@@ -16,67 +16,93 @@ export default async function BedanktPage({
   const findings = Number(sp.n ?? "0");
 
   return (
-    <div className="min-h-dvh bg-ink-900 text-white">
-      <div className="bg-noise absolute inset-0 -z-10" />
-      <div className="mx-auto flex min-h-dvh max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
-        <svg
-          width="72"
-          height="72"
-          viewBox="0 0 72 72"
-          className="mb-6"
-          aria-hidden="true"
-        >
-          <circle cx="36" cy="36" r="34" stroke="#d68f27" strokeWidth="2" fill="none" />
-          <path
-            d="M22 36 L32 46 L52 26"
-            stroke="#d68f27"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        </svg>
+    <div className="min-h-dvh bg-canvas">
+      <header className="hairline-b bg-canvas">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link
+            href="/"
+            aria-label={`${SITE.brand} home`}
+            className="flex items-center gap-2.5 text-ink"
+          >
+            <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+              <rect x="3.5" y="3.5" width="21" height="21" rx="3" stroke="#0a0a0a" strokeWidth="1.5" fill="transparent" />
+              <path d="M9 17 L13 13 L16 16 L20 10" stroke="#a16207" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <span className="font-display text-lg tracking-tight">{SITE.brand}</span>
+          </Link>
+        </div>
+      </header>
 
-        <p className="text-sm font-bold uppercase tracking-widest text-gold-400">
-          Bedankt
+      <main className="mx-auto max-w-3xl px-6 py-20">
+        <p className="text-xs font-medium uppercase tracking-eyebrow text-ink-muted">
+          Scan voltooid
         </p>
-        <h1 className="mt-3 text-balance text-4xl font-bold md:text-5xl">
-          Uw rapport is onderweg naar uw mailbox
+        <h1 className="mt-5 font-display text-display-xl text-ink text-balance">
+          Het rapport is onderweg.
         </h1>
-        <p className="mt-6 text-lg text-white/80">
-          We hebben {findings > 0 ? findings : ""} {findings === 1 ? "bevinding" : "bevindingen"}
-          {findings > 0 ? " verwerkt in uw persoonlijke PDF-rapport" : " opgesteld in uw persoonlijke PDF"}. Het zou binnen enkele minuten bij u moeten zijn.
-          Geen mail ontvangen? Check uw spam-folder of laat het ons weten.
+        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+          {findings > 0
+            ? `De engine signaleerde ${findings} ${findings === 1 ? "aandachtspunt" : "aandachtspunten"}. Deze zijn uitgewerkt in je persoonlijke PDF-rapport — binnen enkele minuten in je inbox.`
+            : "De engine vond geen directe signalen op de structuur die je hebt opgegeven. Het persoonlijke PDF-rapport bevestigt dit en documenteert de getoetste punten."}
+        </p>
+        <p className="mt-3 text-sm text-ink-muted">
+          Geen mail binnen 10 minuten? Kijk in je spam, of neem contact op via{" "}
+          <a
+            href={`mailto:${SITE.contactEmail}`}
+            className="underline decoration-line underline-offset-4 hover:decoration-ink"
+          >
+            {SITE.contactEmail}
+          </a>
+          .
         </p>
         {sp.rid ? (
-          <p className="mt-3 text-sm text-white/50">
-            Referentie: <span className="font-mono text-white/70">{sp.rid}</span>
+          <p className="mt-2 font-mono text-xs text-ink-subtle tabular-nums">
+            Referentie: {sp.rid}
           </p>
         ) : null}
 
-        <div className="mt-10 w-full max-w-md rounded-xl border border-white/10 bg-white/5 p-6 text-left">
-          <h2 className="text-lg font-semibold">Volgende stap (optioneel)</h2>
-          <p className="mt-2 text-sm text-white/70">
-            Wilt u de bevindingen samen doornemen? Plan vrijblijvend een gesprek
-            van 30 minuten. Geen verkooppraatje — we lopen het rapport met u door.
-          </p>
-          <a
-            href={SITE.calUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="mt-4 inline-flex items-center gap-2 rounded-md bg-gold-500 px-5 py-3 text-sm font-semibold text-ink-900 transition hover:bg-gold-400"
-          >
-            Plan gratis gesprek →
-          </a>
+        <div className="mt-14 grid gap-0 border border-line md:grid-cols-2">
+          <div className="p-8">
+            <p className="font-mono text-xs text-ink-subtle tabular-nums">01</p>
+            <h2 className="mt-3 font-display text-2xl text-ink">
+              Het rapport lezen
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              Bevindingen zijn gerangschikt naar impact × complexiteit. Ieder punt verwijst naar het onderliggende artikel of besluit.
+            </p>
+            <Link
+              href="/kennisbank"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink"
+            >
+              Achtergrondartikelen →
+            </Link>
+          </div>
+          <div className="border-t border-line bg-canvas-50 p-8 md:border-l md:border-t-0">
+            <p className="font-mono text-xs text-ink-subtle tabular-nums">02</p>
+            <h2 className="mt-3 font-display text-2xl text-ink">
+              Samen doorlopen
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              Een gesprek van 30 minuten om de bevindingen in de context van jouw situatie te plaatsen — zonder opvolg-verplichting.
+            </p>
+            <a
+              href={SITE.calUrl}
+              target="_blank"
+              rel="noopener"
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas hover:bg-ink-soft"
+            >
+              Plan kennismaking →
+            </a>
+          </div>
         </div>
 
         <Link
           href="/"
-          className="mt-10 text-sm text-white/60 underline decoration-white/20 underline-offset-4 hover:text-white"
+          className="mt-14 inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink"
         >
-          ← Terug naar home
+          ← Terug naar platform
         </Link>
-      </div>
+      </main>
     </div>
   );
 }

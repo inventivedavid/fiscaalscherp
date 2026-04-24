@@ -2,10 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  experimental: {
-    // @react-pdf/renderer bevat server-only deps; laat Next deze niet bundelen voor edge.
-    serverComponentsExternalPackages: ["@react-pdf/renderer"],
-  },
+  // @react-pdf/renderer bevat server-only deps; laat Next deze niet bundelen voor edge.
+  serverExternalPackages: ["@react-pdf/renderer"],
   async headers() {
     return [
       {

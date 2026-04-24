@@ -9,59 +9,71 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Donker navy + warm goud — autoriteit + vertrouwen.
-        ink: {
-          50: "#f4f6fa",
-          100: "#e4e9f2",
-          200: "#c3cddf",
-          300: "#95a5c2",
-          400: "#6278a1",
-          500: "#425a85",
-          600: "#2f4268",
-          700: "#243454",
-          800: "#1a2740",
-          900: "#111b2e",
-          950: "#0a1020",
+        // Warm off-white (stone-achtig), near-black ink, zeer ingetogen amber accent.
+        canvas: {
+          DEFAULT: "#fafaf8",
+          50: "#fdfdfb",
+          100: "#f5f4f0",
+          200: "#e9e7e1",
+          300: "#d6d3ca",
+          400: "#a8a39a",
+          500: "#78746a",
+          600: "#57544c",
+          700: "#3d3b35",
+          800: "#24231f",
+          900: "#121210",
         },
-        gold: {
-          50: "#fdf9ef",
-          100: "#faf0d4",
-          200: "#f4deaa",
-          300: "#ecc474",
-          400: "#e3a845",
-          500: "#d68f27",
-          600: "#b9721d",
-          700: "#95571b",
-          800: "#7a471d",
-          900: "#653c1c",
+        ink: {
+          DEFAULT: "#0a0a0a",
+          soft: "#2b2a28",
+          muted: "#6b6862",
+          subtle: "#97938c",
+        },
+        accent: {
+          // Gebruiken we extreem spaarzaam — kerncijfers, hover states.
+          50: "#fef9ec",
+          100: "#fbefc8",
+          300: "#e5b55a",
+          500: "#a16207", // deep amber
+          700: "#713f12",
+        },
+        line: {
+          DEFAULT: "#e7e5e0",
+          strong: "#d4d1c8",
         },
       },
       fontFamily: {
-        sans: [
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "Inter",
-          "Roboto",
-          "sans-serif",
-        ],
-        serif: ["ui-serif", "Georgia", "Cambria", "Times New Roman", "serif"],
+        // Sans: Inter (via next/font)
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Display serif: Instrument Serif (via next/font) — alleen voor headlines.
+        display: ["var(--font-display)", "Georgia", "serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
-      maxWidth: {
-        prose: "68ch",
+      fontSize: {
+        "display-xl": ["clamp(2.5rem, 5vw + 1rem, 5rem)", { lineHeight: "1.02", letterSpacing: "-0.02em" }],
+        "display-lg": ["clamp(2rem, 3vw + 1rem, 3.5rem)", { lineHeight: "1.05", letterSpacing: "-0.02em" }],
+        "display-md": ["clamp(1.5rem, 2vw + 0.5rem, 2.25rem)", { lineHeight: "1.1", letterSpacing: "-0.015em" }],
+      },
+      letterSpacing: {
+        eyebrow: "0.14em",
       },
       boxShadow: {
-        soft: "0 10px 30px -10px rgba(17, 27, 46, 0.12)",
+        card: "0 1px 2px rgba(10,10,10,0.04), 0 8px 24px -12px rgba(10,10,10,0.08)",
+        ring: "0 0 0 1px rgba(10,10,10,0.08)",
       },
       keyframes: {
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(12px)" },
+          "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        "counter": {
+          "0%": { opacity: "0.3" },
+          "100%": { opacity: "1" },
         },
       },
       animation: {
         "fade-up": "fade-up 0.5s ease-out both",
+        "counter": "counter 0.6s ease-out both",
       },
     },
   },
