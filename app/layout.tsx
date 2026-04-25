@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif } from "next/font/google";
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { SITE } from "@/lib/site";
@@ -18,37 +18,47 @@ const display = Instrument_Serif({
   display: "swap",
 });
 
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: `${SITE.brand} — Fiscaal platform voor DGA's`,
+    default: `${SITE.brand} — Vertrouwelijk fiscaal dossier`,
     template: `%s · ${SITE.brand}`,
   },
   description:
-    "Een onderzoeksplatform voor fiscale optimalisatie van Nederlandse DGA's. Scan, tools, benchmarks en kennisbank — gebouwd op de actuele wet- en regelgeving.",
+    "Een vertrouwelijk, op jou afgestemd fiscaal dossier voor Nederlandse DGA's. Privé, gefundeerd op de actuele wetgeving, opgebouwd in stappen.",
   openGraph: {
     type: "website",
     locale: "nl_NL",
     url: SITE.url,
     siteName: SITE.brand,
-    title: `${SITE.brand} — Fiscaal platform voor DGA's`,
+    title: `${SITE.brand} — Vertrouwelijk fiscaal dossier`,
     description:
-      "Scan, tools, benchmarks en kennisbank voor fiscale optimalisatie van Nederlandse DGA's.",
+      "Persoonlijk fiscaal dossier voor DGA's. Vertrouwelijk, gefundeerd, stapsgewijs opgebouwd.",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE.brand} — Fiscaal platform voor DGA's`,
+    title: `${SITE.brand} — Vertrouwelijk fiscaal dossier`,
     description:
-      "Scan, tools, benchmarks en kennisbank voor fiscale optimalisatie van Nederlandse DGA's.",
+      "Persoonlijk fiscaal dossier voor DGA's. Vertrouwelijk, gefundeerd, stapsgewijs opgebouwd.",
   },
   robots: { index: true, follow: true },
   alternates: { canonical: SITE.url },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fafaf8",
+  themeColor: "#0a0b0d",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -57,7 +67,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="nl" className={`${inter.variable} ${display.variable}`}>
+    <html
+      lang="nl"
+      className={`${inter.variable} ${display.variable} ${mono.variable}`}
+    >
       <body className="min-h-dvh antialiased">
         {children}
         {SITE.plausibleDomain ? (

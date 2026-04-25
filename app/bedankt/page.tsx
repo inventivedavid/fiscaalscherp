@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Rapport is onderweg",
+  title: "Dossier overgedragen",
   robots: { index: false, follow: false },
 };
 
@@ -16,91 +16,85 @@ export default async function BedanktPage({
   const findings = Number(sp.n ?? "0");
 
   return (
-    <div className="min-h-dvh bg-canvas">
-      <header className="hairline-b bg-canvas">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link
-            href="/"
-            aria-label={`${SITE.brand} home`}
-            className="flex items-center gap-2.5 text-ink"
-          >
-            <svg width="26" height="26" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <rect x="3.5" y="3.5" width="21" height="21" rx="3" stroke="#0a0a0a" strokeWidth="1.5" fill="transparent" />
-              <path d="M9 17 L13 13 L16 16 L20 10" stroke="#a16207" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <span className="font-display text-lg tracking-tight">{SITE.brand}</span>
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-[100dvh] bg-obsidian-900 pt-safe text-bone">
+      <div className="classified-banner flex items-center justify-between px-4 py-1.5">
+        <span>Vertrouwelijk · Overgedragen</span>
+        <span className="font-mono tabular-nums text-bone/55">
+          {sp.rid ?? "—"}
+        </span>
+      </div>
 
-      <main className="mx-auto max-w-3xl px-6 py-20">
-        <p className="text-xs font-medium uppercase tracking-eyebrow text-ink-muted">
-          Scan voltooid
+      <main className="mx-auto max-w-3xl px-5 pb-20 pt-12 md:px-6 md:pt-20">
+        <p className="font-mono text-[10px] tracking-stamp uppercase text-emerald-300">
+          Dossier ontvangen · stap voltooid
         </p>
-        <h1 className="mt-5 font-display text-display-xl text-ink text-balance">
-          Het rapport is onderweg.
+        <h1 className="mt-4 font-display text-display-xl text-bone text-balance">
+          Het dossier ligt klaar bij je strateeg.
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+        <p className="mt-6 max-w-2xl text-[15px] leading-relaxed text-bone/70">
           {findings > 0
-            ? `De engine signaleerde ${findings} ${findings === 1 ? "aandachtspunt" : "aandachtspunten"}. Deze zijn uitgewerkt in je persoonlijke PDF-rapport — binnen enkele minuten in je inbox.`
-            : "De engine vond geen directe signalen op de structuur die je hebt opgegeven. Het persoonlijke PDF-rapport bevestigt dit en documenteert de getoetste punten."}
+            ? `De engine markeerde ${findings} ${findings === 1 ? "bevinding" : "bevindingen"}. Het volledige rapport — met onderbouwing en concrete vervolgvragen — is binnen enkele minuten in je inbox.`
+            : "De engine vond geen directe rode regels op de structuur die je hebt vastgelegd. Het rapport bevestigt dit en documenteert de getoetste punten."}
         </p>
-        <p className="mt-3 text-sm text-ink-muted">
-          Geen mail binnen 10 minuten? Kijk in je spam, of neem contact op via{" "}
+        <p className="mt-3 text-[13px] text-bone/55">
+          Geen mail binnen tien minuten? Kijk in je spam, of stuur ons een
+          bericht via{" "}
           <a
             href={`mailto:${SITE.contactEmail}`}
-            className="underline decoration-line underline-offset-4 hover:decoration-ink"
+            className="text-bone underline decoration-emerald-400/60 underline-offset-4 hover:decoration-emerald-400"
           >
             {SITE.contactEmail}
           </a>
           .
         </p>
         {sp.rid ? (
-          <p className="mt-2 font-mono text-xs text-ink-subtle tabular-nums">
+          <p className="mt-2 font-mono text-[11px] tracking-mark text-bone/35 tabular-nums">
             Referentie: {sp.rid}
           </p>
         ) : null}
 
-        <div className="mt-14 grid gap-0 border border-line md:grid-cols-2">
-          <div className="p-8">
-            <p className="font-mono text-xs text-ink-subtle tabular-nums">01</p>
-            <h2 className="mt-3 font-display text-2xl text-ink">
-              Het rapport lezen
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Bevindingen zijn gerangschikt naar impact × complexiteit. Ieder punt verwijst naar het onderliggende artikel of besluit.
+        <div className="mt-12 grid gap-3 md:grid-cols-2">
+          <article className="glass rounded-2xl p-6 md:p-7">
+            <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/45">
+              01 · Wat nu gebeurt
             </p>
-            <Link
-              href="/kennisbank"
-              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-ink underline decoration-line underline-offset-4 hover:decoration-ink"
-            >
-              Achtergrondartikelen →
-            </Link>
-          </div>
-          <div className="border-t border-line bg-canvas-50 p-8 md:border-l md:border-t-0">
-            <p className="font-mono text-xs text-ink-subtle tabular-nums">02</p>
-            <h2 className="mt-3 font-display text-2xl text-ink">
-              Samen doorlopen
+            <h2 className="mt-3 font-display text-2xl text-bone">
+              Strateeg neemt het dossier door
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Een gesprek van 30 minuten om de bevindingen in de context van jouw situatie te plaatsen — zonder opvolg-verplichting.
+            <p className="mt-3 text-[14px] leading-relaxed text-bone/65">
+              Binnen één werkdag krijg je een persoonlijk voorstel voor een
+              kennismakingsgesprek van vijftien minuten. Vrijblijvend en
+              zonder verkooppraatje.
+            </p>
+          </article>
+
+          <article className="glass rounded-2xl p-6 md:p-7">
+            <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/45">
+              02 · Direct inplannen
+            </p>
+            <h2 className="mt-3 font-display text-2xl text-bone">
+              Liever zelf een tijdslot kiezen?
+            </h2>
+            <p className="mt-3 text-[14px] leading-relaxed text-bone/65">
+              Reserveer direct vijftien minuten op een moment dat schikt.
             </p>
             <a
               href={SITE.calUrl}
               target="_blank"
               rel="noopener"
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas hover:bg-ink-soft"
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-[13px] font-medium text-obsidian-900 transition hover:bg-emerald-400"
             >
-              Plan kennismaking →
+              Kennismaking inplannen
+              <span aria-hidden>→</span>
             </a>
-          </div>
+          </article>
         </div>
 
         <Link
           href="/"
-          className="mt-14 inline-flex items-center gap-2 text-sm text-ink-muted hover:text-ink"
+          className="mt-12 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-stamp text-bone/45 transition hover:text-bone"
         >
-          ← Terug naar platform
+          ← terug naar dossier
         </Link>
       </main>
     </div>

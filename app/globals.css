@@ -3,53 +3,198 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --scroll-padding: 80px;
+  color-scheme: dark;
+  --reveal-width: 0%;
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: var(--scroll-padding);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-feature-settings: "ss01", "cv11";
+  background: #0a0b0d;
 }
 
 body {
-  @apply bg-canvas text-ink;
+  @apply bg-obsidian-900 text-bone;
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  background-image:
+    radial-gradient(80% 60% at 50% -10%, rgba(62, 207, 148, 0.05), transparent 60%),
+    radial-gradient(60% 40% at 100% 100%, rgba(201, 169, 97, 0.04), transparent 60%);
+  background-attachment: fixed;
+  min-height: 100dvh;
+  overscroll-behavior-y: none;
 }
 
-/* Display font gets optical correction for better weight distribution. */
-.font-display {
-  font-feature-settings: "ss01" on;
+@layer base {
+  ::selection {
+    background: rgba(62, 207, 148, 0.25);
+    color: #e8e2d4;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid #3ecf94;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Native form normalisatie voor dark theme */
+  input[type="email"],
+  input[type="text"],
+  input[type="tel"],
+  textarea {
+    color-scheme: dark;
+  }
 }
 
-/* Focus rings: rustig, alleen zichtbaar bij keyboard-navigatie. */
-:focus:not(:focus-visible) {
-  outline: none;
-}
-:focus-visible {
-  outline: 2px solid theme('colors.ink.DEFAULT');
-  outline-offset: 3px;
-  border-radius: 2px;
+@layer utilities {
+  /* Hairlines op witte alfa zodat het overal werkt op de obsidian basis. */
+  .hairline {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .hairline-strong {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  /* Legacy directionele hairlines — secundaire pagina's gebruiken deze nog. */
+  .hairline-b {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-t {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-r {
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .hairline-l {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Stempel-vlak — gold rand, vaag papier-glow, lichte rotatie. */
+  .stamp {
+    border: 1px solid rgba(201, 169, 97, 0.55);
+    color: #e5c97d;
+    background: linear-gradient(180deg, rgba(201, 169, 97, 0.06), rgba(201, 169, 97, 0.02));
+    text-shadow: 0 0 12px rgba(201, 169, 97, 0.2);
+    box-shadow: 0 0 0 1px rgba(201, 169, 97, 0.1) inset, 0 1px 0 rgba(0, 0, 0, 0.5);
+  }
+  .stamp-rotate {
+    transform: rotate(-7deg);
+  }
+
+  /* Geredigeerde regel — zwarte balk met grain, blokkeert lezen. */
+  .redact {
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.01) 0,
+        rgba(255, 255, 255, 0.01) 2px,
+        transparent 2px,
+        transparent 5px
+      ),
+      linear-gradient(180deg, #16181c, #0c0d10);
+    color: transparent;
+    border-radius: 2px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    user-select: none;
+  }
+
+  /* Glas-paneel voor sectiekaarten en het dossier-ruggetje. */
+  .glass {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.035),
+      rgba(255, 255, 255, 0.015) 40%,
+      rgba(255, 255, 255, 0.01)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 1px 0 rgba(0, 0, 0, 0.5),
+      0 24px 48px -32px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Classified banner — gold tekst op donker papier, gestreepte rand. */
+  .classified-banner {
+    background: linear-gradient(
+      180deg,
+      rgba(201, 169, 97, 0.07),
+      rgba(201, 169, 97, 0.02)
+    );
+    color: #e5c97d;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 500;
+    border-top: 1px solid rgba(201, 169, 97, 0.25);
+    border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+  }
+
+  /* Subtiel scan-grid voor achtergrond — extreem laag contrast. */
+  .bg-scan-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Tabular nums helper. */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Snap-scroll container voor de mobiele kaarten-flow. */
+  .snap-y-cards {
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .snap-y-cards > * {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+
+  /* Verbergt visueel maar blijft leesbaar voor screenreader. */
+  .sr-only-mobile {
+    @apply sr-only;
+  }
+  @media (min-width: 768px) {
+    .sr-only-mobile {
+      position: static;
+      width: auto;
+      height: auto;
+      clip: auto;
+      overflow: visible;
+    }
+  }
+
+  /* Safe-area helpers voor de bottom-CTA op mobiel. */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0.75rem);
+  }
+
+  /* Pseudo-3D kantelvlak voor stempels in DossierSpine. */
+  .seal-disc {
+    background:
+      radial-gradient(circle at 35% 35%, rgba(229, 201, 125, 0.35), rgba(201, 169, 97, 0.12) 60%, rgba(20, 22, 25, 0.0) 70%),
+      conic-gradient(from 0deg, rgba(201, 169, 97, 0.5), rgba(201, 169, 97, 0.18), rgba(201, 169, 97, 0.5));
+    border: 1px solid rgba(201, 169, 97, 0.5);
+  }
 }
 
-/* Hairline top-border utility voor sections die "papier" indruk geven. */
-.hairline-t {
-  border-top: 1px solid theme('colors.line.DEFAULT');
-}
-.hairline-b {
-  border-bottom: 1px solid theme('colors.line.DEFAULT');
-}
-
-/* Getal-tabel-stijl voor data-dichte panelen (numerieke uitlijning). */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Subtle dot-grid voor sommige backgrounds — institutioneel papier-gevoel. */
-.bg-dot-grid {
-  background-image: radial-gradient(circle, rgba(10, 10, 10, 0.06) 1px, transparent 1px);
-  background-size: 22px 22px;
+/* Reduced motion — alle animaties + boot-cursor naar instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

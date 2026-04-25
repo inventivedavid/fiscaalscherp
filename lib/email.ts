@@ -133,6 +133,67 @@ export async function sendReportEmail(args: {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
+// Magic-link voor het hervatten van een dossier. Geen wachtwoord, alleen een
+// signed token in de URL. 30 dagen geldig (zie lib/dossierToken.ts).
+// ──────────────────────────────────────────────────────────────────────────────
+export async function sendDossierResumeEmail(args: {
+  to: string;
+  resumeUrl: string;
+  progressPct: number;
+  savings: { min: number; max: number };
+}): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  if (!resend) return { ok: false, error: "Resend is niet geconfigureerd." };
+
+  const euro = (n: number) =>
+    new Intl.NumberFormat("nl-NL", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(n);
+
+  const pct = Math.round(args.progressPct);
+
+  const bodyHtml = `
+    <p style="margin:0 0 16px 0;">Hallo,</p>
+    <p style="margin:0 0 16px 0;">
+      Je fiscaal dossier bij ${SITE.brand} is op je naam vastgelegd. Op dit moment is het voor <strong>${pct}%</strong> ingevuld; de tot nu toe in beeld gekomen optimalisatieruimte ligt op indicatief <strong>${euro(args.savings.min)} – ${euro(args.savings.max)}</strong> per jaar.
+    </p>
+    <p style="margin:0 0 20px 0;">
+      Met de privé-link hieronder ga je verder waar je gebleven was — op elk apparaat, geen wachtwoord nodig.
+    </p>
+
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:24px 0;">
+      <tr><td style="background:#0a0a0a;">
+        <a href="${args.resumeUrl}" style="display:inline-block;color:#fafaf8;text-decoration:none;padding:13px 22px;font-weight:500;font-size:14px;">
+          Dossier hervatten →
+        </a>
+      </td></tr>
+    </table>
+
+    <p style="margin:0 0 12px 0;font-size:13px;color:#6b6862;">
+      De link is 30 dagen geldig en uitsluitend bestemd voor jou. Bewaar deze mail zorgvuldig — wie de link heeft, kan het dossier openen.
+    </p>
+    <p style="margin:16px 0 0 0;font-size:12px;color:#97938c;line-height:1.6;">
+      Heb je deze mail niet aangevraagd? Verwijder hem dan; er is geen account aangemaakt en zonder de link gebeurt er niets verder.
+    </p>
+  `;
+
+  try {
+    const res = await resend.emails.send({
+      from: FROM,
+      to: args.to,
+      replyTo: REPLY_TO,
+      subject: `Je dossier is vastgelegd — link om verder te gaan`,
+      html: wrap(bodyHtml, `Je dossier is vastgelegd · ${pct}% ingevuld`),
+    });
+    if (res.error) return { ok: false, error: res.error.message };
+    return { ok: true, id: res.data?.id ?? "unknown" };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "unknown" };
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Follow-up mails — ingepland via Vercel Cron.
 // Doel: inhoudelijke waarde bieden, geen druk opbouwen. Wie niet reageert,
 // leest ze later alsnog; wie interesse heeft, vindt vanzelf de juiste link.

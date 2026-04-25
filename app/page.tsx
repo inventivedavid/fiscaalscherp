@@ -1,29 +1,12 @@
-import { Nav } from "@/components/platform/Nav";
-import { Hero } from "@/components/platform/Hero";
-import { StatsStrip } from "@/components/platform/StatsStrip";
-import { ProductMap } from "@/components/platform/ProductMap";
-import { Methodology } from "@/components/platform/Methodology";
-import { PricingBlock } from "@/components/platform/PricingBlock";
-import { FAQ } from "@/components/platform/FAQ";
-import { ClosingCTA } from "@/components/platform/ClosingCTA";
-import { Footer } from "@/components/platform/Footer";
+import { Suspense } from "react";
+import { CockpitShell } from "@/components/cockpit/CockpitShell";
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default function Page() {
   return (
-    <>
-      <Nav />
-      <main>
-        <Hero />
-        <StatsStrip />
-        <ProductMap />
-        <Methodology />
-        <PricingBlock />
-        <FAQ />
-        <ClosingCTA />
-      </main>
-      <Footer />
-    </>
+    <Suspense fallback={null}>
+      <CockpitShell />
+    </Suspense>
   );
 }
