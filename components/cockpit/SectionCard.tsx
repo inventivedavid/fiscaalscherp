@@ -1,5 +1,13 @@
 "use client";
 
+// SectionCard — de "Chamber" rechts van de dial.
+// Geen kaartrand met afgeronde glass — wel een brushed-metal vlak met een
+// hairline aan top/right/bottom; de linker-flank is open richting de dial,
+// zodat het visueel aan de kluis vasthangt.
+//
+// Romeins cijfer in groot, gegraveerde serif boven de vraag.
+// Optierijen zijn hairline-rijen met emerald spoor links bij selectie.
+
 import { useEffect, useRef, useState } from "react";
 import { useCockpit } from "./store";
 import { findSectionById } from "./sections";
@@ -44,21 +52,35 @@ export function SectionCard() {
 
   return (
     <section
+      key={currentQuestion.key}
       aria-labelledby={`q-${currentQuestion.key}`}
-      className="relative mx-auto flex h-full w-full max-w-2xl flex-col px-5 pb-32 pt-6 md:px-6 md:pb-12 md:pt-10"
+      className={[
+        "relative mx-auto flex h-full w-full max-w-2xl flex-col px-5 pb-32 pt-6 md:px-8 md:pb-12 md:pt-10",
+        "brushed ring-hairline-open-l shadow-engrave md:rounded-r-2xl md:rounded-l-none",
+        "animate-chamber-open",
+      ].join(" ")}
     >
-      {/* Sectie-kop */}
-      <div className="mb-5 flex items-center gap-3">
-        <span className="font-mono text-[10px] tracking-stamp uppercase text-gold-300">
-          {section.classified}
+      {/* Sectie-kop: groot Romeins cijfer + sectietitel naast de teller */}
+      <div className="mb-6 flex items-baseline gap-4">
+        <span
+          aria-hidden
+          className="font-display text-4xl leading-none text-emerald-300/90 etch-emerald md:text-5xl"
+          style={{ letterSpacing: "0.04em" }}
+        >
+          {section.ordinal}
         </span>
-        <span className="hidden font-mono text-[10px] tracking-mark text-bone/35 md:inline">
-          · {blockTitle.toLowerCase()}
-        </span>
+        <div className="flex flex-1 flex-col">
+          <span className="font-mono text-[10px] uppercase tracking-stamp text-bone/45">
+            Sectie · {section.classified.replace(/^Sectie\s\w+\s·\s/, "")}
+          </span>
+          <span className="font-mono text-[9px] uppercase tracking-mark text-bone/30">
+            {blockTitle.toLowerCase()} · vraag {indexInSection.cur} / {indexInSection.total}
+          </span>
+        </div>
       </div>
 
-      {/* Framing line — niet-vergelijkend, eerste persoon */}
-      <p className="mb-5 max-w-xl text-[13px] leading-relaxed text-bone/60">
+      {/* Framing-regel — niet-vergelijkend, eerste persoon */}
+      <p className="mb-6 max-w-xl text-[13px] leading-relaxed text-bone/55">
         {framing}
       </p>
 
@@ -66,31 +88,46 @@ export function SectionCard() {
         id={`q-${currentQuestion.key}`}
         ref={headingRef}
         tabIndex={-1}
-        className="font-display text-3xl text-bone outline-none md:text-4xl"
+        className="font-display text-3xl text-bone outline-none etch md:text-[2.5rem] md:leading-[1.05]"
       >
         {currentQuestion.label}
       </h2>
       {currentQuestion.help ? (
-        <p className="mt-3 max-w-xl text-[14px] text-bone/60">
+        <p className="mt-3 max-w-xl text-[14px] text-bone/55">
           {currentQuestion.help}
         </p>
       ) : null}
 
-      <div className="mt-7 grid gap-2.5">
-        {currentQuestion.options.map((opt) => {
+      {/* Optierijen — hairline rows, emerald spoor links bij selectie. */}
+      <div className="mt-8 flex flex-col">
+        {currentQuestion.options.map((opt, i) => {
           const id = `${currentQuestion.key}-${opt.value}`;
           const checked = value === opt.value;
+          const isFirst = i === 0;
           return (
             <label
               key={opt.value}
               htmlFor={id}
               className={[
-                "group relative flex cursor-pointer items-start gap-4 rounded-xl border px-4 py-3.5 text-left transition",
+                "group relative flex cursor-pointer items-start gap-4 px-2 py-4 text-left transition-colors",
+                isFirst ? "border-t border-white/[0.06]" : "",
+                "border-b border-white/[0.06]",
                 checked
-                  ? "border-emerald-400/60 bg-emerald-400/[0.08] shadow-emeraldGlow"
-                  : "border-white/8 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]",
+                  ? "bg-emerald-400/[0.04]"
+                  : "hover:bg-white/[0.02]",
               ].join(" ")}
             >
+              {/* Emerald spoor links als 'checked'-indicator. */}
+              <span
+                aria-hidden
+                className={[
+                  "absolute left-0 top-0 h-full w-[2px] transition-all",
+                  checked
+                    ? "bg-emerald-400 shadow-[0_0_10px_rgba(62,207,148,0.5)]"
+                    : "bg-transparent group-hover:bg-white/10",
+                ].join(" ")}
+              />
+
               <input
                 id={id}
                 type="radio"
@@ -100,30 +137,35 @@ export function SectionCard() {
                 onChange={(e) => setAnswer(currentQuestion.key, e.target.value)}
                 className="sr-only"
               />
+
+              {/* Mini cirkel-indicator. */}
               <span
                 aria-hidden
                 className={[
-                  "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition",
+                  "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition",
                   checked
-                    ? "border-emerald-400 bg-emerald-400/30"
-                    : "border-white/20 bg-transparent group-hover:border-white/40",
+                    ? "border-emerald-400 bg-emerald-400/20"
+                    : "border-white/15 bg-transparent group-hover:border-white/35",
                 ].join(" ")}
               >
                 {checked ? (
-                  <span className="block h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="block h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 ) : null}
               </span>
+
               <span className="flex-1">
                 <span
                   className={[
-                    "block text-[15px] font-medium leading-snug",
-                    checked ? "text-bone" : "text-bone/85",
+                    "block text-[15px] leading-snug",
+                    checked
+                      ? "font-medium text-bone etch"
+                      : "text-bone/85",
                   ].join(" ")}
                 >
                   {opt.label}
                 </span>
                 {opt.hint ? (
-                  <span className="mt-1 block text-[12px] text-bone/45">
+                  <span className="mt-1 block text-[12px] text-bone/40">
                     {opt.hint}
                   </span>
                 ) : null}
@@ -142,13 +184,13 @@ export function SectionCard() {
         </p>
       ) : null}
 
-      {/* Navigatie — desktop inline, mobiel zit primaire CTA in CockpitShell footer */}
+      {/* Navigatie — desktop inline, mobiel sticky bottom */}
       <div className="mt-10 hidden items-center justify-between md:flex">
         {state.questionIndex > 0 ? (
           <button
             type="button"
             onClick={back}
-            className="font-mono text-[11px] uppercase tracking-stamp text-bone/45 transition hover:text-bone"
+            className="font-mono text-[11px] uppercase tracking-stamp text-bone/40 transition hover:text-bone"
           >
             ← vorige
           </button>
@@ -158,10 +200,20 @@ export function SectionCard() {
         <button
           type="button"
           onClick={handleAdvance}
-          className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3 text-[13px] font-medium text-obsidian-900 transition hover:bg-emerald-400"
+          className={[
+            "group inline-flex items-center gap-3 rounded-full border px-7 py-3 text-[13px] font-medium transition",
+            "border-emerald-400/60 bg-emerald-400/[0.08] text-emerald-200",
+            "hover:border-emerald-400 hover:bg-emerald-400/[0.14] hover:text-bone",
+            "shadow-[0_0_24px_-12px_rgba(62,207,148,0.6)]",
+          ].join(" ")}
         >
+          <span className="font-mono text-[9px] uppercase tracking-stamp text-emerald-400/70">
+            etch
+          </span>
           Vastleggen
-          <span aria-hidden>→</span>
+          <span aria-hidden className="transition group-hover:translate-x-0.5">
+            →
+          </span>
         </button>
       </div>
 
@@ -200,7 +252,7 @@ function CockpitFooterMobile({
 }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 md:hidden">
-      <div className="bg-gradient-to-t from-obsidian-900 via-obsidian-900/95 to-transparent px-5 pb-safe pt-6">
+      <div className="brushed border-t border-white/[0.06] px-5 pb-safe pt-4 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.7)]">
         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-stamp text-bone/40">
           <span>{progressLabel}</span>
           {onBack ? (
@@ -218,15 +270,27 @@ function CockpitFooterMobile({
           onClick={onAdvance}
           disabled={!canAdvance}
           className={[
-            "flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-[15px] font-medium transition",
+            "flex w-full items-center justify-center gap-3 rounded-2xl border py-4 text-[15px] font-medium transition",
             canAdvance
-              ? "bg-emerald-500 text-obsidian-900 active:scale-[0.99]"
-              : "border border-white/10 bg-white/[0.02] text-bone/35",
+              ? "border-emerald-400/60 bg-emerald-400/[0.10] text-bone shadow-[0_0_30px_-12px_rgba(62,207,148,0.6)] active:scale-[0.99]"
+              : "border-white/10 bg-white/[0.02] text-bone/35",
           ].join(" ")}
         >
-          {canAdvance ? "Vastleggen" : "Kies een optie"}
-          {canAdvance ? <span aria-hidden>→</span> : null}
+          {canAdvance ? (
+            <>
+              <span className="font-mono text-[9px] uppercase tracking-stamp text-emerald-400/70">
+                etch
+              </span>
+              Vastleggen
+              <span aria-hidden>→</span>
+            </>
+          ) : (
+            "Kies een optie"
+          )}
         </button>
+        <p className="mt-2 text-center font-mono text-[8.5px] uppercase tracking-stamp text-bone/30">
+          Vastleggen tikt de dial één arc verder
+        </p>
       </div>
     </div>
   );

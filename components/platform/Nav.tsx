@@ -60,10 +60,16 @@ export function Nav({ variant = "light" }: { variant?: "light" | "transparent" }
 
         <div className="hidden md:block">
           <Link
-            href="/scan"
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition hover:bg-ink-soft"
+            href="/"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-emerald-400/50 bg-emerald-400/[0.08] px-5 py-2 text-sm text-bone transition hover:border-emerald-400 hover:bg-emerald-400/[0.14] shadow-[0_0_24px_-12px_rgba(62,207,148,0.6)]"
           >
-            Start scan
+            <span className="font-mono text-[9px] uppercase tracking-stamp text-emerald-400/70">
+              ↳
+            </span>
+            Open dossier
+            <span aria-hidden className="transition group-hover:translate-x-0.5">
+              →
+            </span>
           </Link>
         </div>
 
@@ -101,11 +107,11 @@ export function Nav({ variant = "light" }: { variant?: "light" | "transparent" }
             ))}
             <li className="pt-4">
               <Link
-                href="/scan"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-medium text-canvas"
+                href="/"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-emerald-400/60 bg-emerald-400/[0.10] px-5 py-3 text-sm text-bone shadow-[0_0_24px_-12px_rgba(62,207,148,0.6)]"
                 onClick={() => setOpen(false)}
               >
-                Start scan
+                Open dossier <span aria-hidden>→</span>
               </Link>
             </li>
           </ul>
@@ -115,35 +121,47 @@ export function Nav({ variant = "light" }: { variant?: "light" | "transparent" }
   );
 }
 
+// LogoMark — micro-VaultDial-glyph. Match met de dial in de hero/cockpit:
+// een hairline ring met VI fijne tikjes en één emerald arc als 'eerste ets'.
 function LogoMark() {
+  const ARCS = 6;
+  const arcGap = 12; // graden
   return (
     <svg
       width="28"
       height="28"
-      viewBox="0 0 28 28"
+      viewBox="-14 -14 28 28"
       fill="none"
       aria-hidden="true"
     >
-      <rect
-        x="3.5"
-        y="3.5"
-        width="21"
-        height="21"
-        rx="3"
-        stroke="#0a0a0a"
-        strokeWidth="1.5"
-        fill="transparent"
-      />
-      <path
-        d="M9 17 L13 13 L16 16 L20 10"
-        stroke="#a16207"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
-      <circle cx="9" cy="17" r="1.2" fill="#0a0a0a" />
-      <circle cx="20" cy="10" r="1.2" fill="#0a0a0a" />
+      <circle r="11" stroke="currentColor" strokeOpacity="0.85" strokeWidth="1" />
+      <circle r="9" stroke="currentColor" strokeOpacity="0.35" strokeWidth="0.6" />
+
+      {/* VI arcs — een hint van de dial. */}
+      <g strokeLinecap="round" fill="none">
+        {Array.from({ length: ARCS }).map((_, i) => {
+          const start = i * 60 + arcGap / 2 - 90;
+          const end = (i + 1) * 60 - arcGap / 2 - 90;
+          const r = 10;
+          const sx = r * Math.cos((start * Math.PI) / 180);
+          const sy = r * Math.sin((start * Math.PI) / 180);
+          const ex = r * Math.cos((end * Math.PI) / 180);
+          const ey = r * Math.sin((end * Math.PI) / 180);
+          const isLit = i === 0;
+          return (
+            <path
+              key={i}
+              d={`M ${sx} ${sy} A ${r} ${r} 0 0 1 ${ex} ${ey}`}
+              stroke={isLit ? "#3ecf94" : "currentColor"}
+              strokeOpacity={isLit ? 1 : 0.35}
+              strokeWidth={isLit ? 1.6 : 1}
+            />
+          );
+        })}
+      </g>
+
+      {/* Centrumpunt. */}
+      <circle r="1.4" fill="#3ecf94" />
     </svg>
   );
 }

@@ -18,6 +18,17 @@ const config: Config = {
           500: "#262a30",
           400: "#3a3f47",
         },
+        // Vault metal-paleta — gebruikt voor brushed/etched oppervlakken
+        // op de cockpit en hero. Bewust dicht bij obsidian, alleen iets
+        // koeler en met meer blauw-grijze headroom.
+        metal: {
+          900: "#0a0b0d",
+          800: "#0f1114",
+          700: "#15181c",
+          600: "#1c2026",
+          500: "#262b32",
+          highlight: "rgba(255,255,255,0.05)",
+        },
         bone: {
           DEFAULT: "#e8e2d4",
           pale: "#f4efe2",
@@ -124,6 +135,12 @@ const config: Config = {
         stamp:
           "0 0 0 1px rgba(201,169,97,0.45), 0 1px 0 rgba(255,255,255,0.04)",
         emeraldGlow: "0 0 36px -12px rgba(62,207,148,0.55)",
+        // Vault depth — gegraveerde inset op metalen oppervlakken.
+        engrave:
+          "inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -1px 0 rgba(0,0,0,0.6)",
+        // Vault depth — donkere put rond de dial (geen blur, harde drop).
+        dialRim:
+          "inset 0 0 0 1px rgba(255,255,255,0.06), 0 30px 80px -40px rgba(0,0,0,0.9)",
         // Legacy
         card: "inset 0 1px 0 rgba(255,255,255,0.04), 0 24px 48px -24px rgba(0,0,0,0.6)",
         ring: "0 0 0 1px rgba(255,255,255,0.08)",
@@ -189,6 +206,48 @@ const config: Config = {
           "60%": { transform: "scale(1.04)", opacity: "1" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        // Vault — dial tikt één notch verder met overshoot.
+        dialTick: {
+          "0%": { transform: "rotate(var(--dial-from, 0deg))" },
+          "60%": { transform: "rotate(calc(var(--dial-to, 0deg) + 4deg))" },
+          "100%": { transform: "rotate(var(--dial-to, 0deg))" },
+        },
+        dialBreathe: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.005)" },
+        },
+        // Vault — een chamber-drawer schuift open.
+        chamberOpen: {
+          "0%": {
+            opacity: "0",
+            clipPath: "inset(0 0 100% 0)",
+            transform: "translateY(8px)",
+          },
+          "60%": {
+            opacity: "1",
+            clipPath: "inset(0 0 0 0)",
+            transform: "translateY(0)",
+          },
+          "100%": {
+            opacity: "1",
+            clipPath: "inset(0 0 0 0)",
+            transform: "translateY(0)",
+          },
+        },
+        // Vault — gegraveerde lijn fade-int met blur die uitzakt.
+        etchFade: {
+          "0%": { opacity: "0", filter: "blur(2px)", letterSpacing: "0.4em" },
+          "100%": {
+            opacity: "1",
+            filter: "blur(0)",
+            letterSpacing: "normal",
+          },
+        },
+        // Vault — emerald puls voor actieve arc.
+        arcPulse: {
+          "0%, 100%": { opacity: "0.85" },
+          "50%": { opacity: "1" },
+        },
         // Legacy: secundaire pagina's gebruiken nog 'fade-up'.
         "fade-up": {
           "0%": { opacity: "0", transform: "translateY(8px)" },
@@ -205,6 +264,11 @@ const config: Config = {
         "boot-cursor": "bootCursor 1s steps(1) infinite",
         "scan-drift": "scanlineDrift 8s linear infinite",
         "seal-ring": "sealRing 0.7s cubic-bezier(.2,.8,.2,1) both",
+        "dial-tick": "dialTick 0.7s cubic-bezier(.2,.8,.2,1) both",
+        "dial-breathe": "dialBreathe 4s ease-in-out infinite",
+        "chamber-open": "chamberOpen 0.65s cubic-bezier(.2,.8,.2,1) both",
+        "etch-fade": "etchFade 0.7s cubic-bezier(.2,.8,.2,1) both",
+        "arc-pulse": "arcPulse 2.4s ease-in-out infinite",
         "fade-up": "fade-up 0.5s ease-out both",
       },
     },

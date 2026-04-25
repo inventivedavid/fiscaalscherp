@@ -1,43 +1,125 @@
-import { MiniCalculator } from "./MiniCalculator";
+"use client";
+
+// Hero — landing-anker met de VaultDial als signatuur.
+// Drie inputs van MiniCalculator etsen één-voor-één een arc op de dial.
+// Zodra de drie zijn ingevuld is een live bedrag in het centrum geëtst.
+// De CTA verwijst naar de cockpit (`/`) voor het volle dossier.
+
+import { useMemo, useState } from "react";
+import { runFlagEngine, totalSavingsRange } from "@/lib/flags";
+import { VaultDial } from "@/components/cockpit/VaultDial";
+import { MiniCalculator, buildAnswers } from "./MiniCalculator";
+import type { Answers } from "@/lib/questions";
+
+type Sector = Answers["sector"];
+type Revenue = Answers["revenue"];
+type Salary = Answers["dga_salary"];
 
 export function Hero() {
+  const [sector, setSector] = useState<Sector | "">("");
+  const [revenue, setRevenue] = useState<Revenue | "">("");
+  const [salary, setSalary] = useState<Salary | "">("");
+
+  const filled = [sector, revenue, salary].filter(Boolean).length;
+  const allFilled = filled === 3;
+
+  // Welke arc-index pulseert als 'next'?
+  const activeIndex = allFilled ? null : filled;
+
+  const result = useMemo(() => {
+    if (!allFilled) return null;
+    const ans = buildAnswers(
+      sector as Sector,
+      revenue as Revenue,
+      salary as Salary,
+    );
+    const findings = runFlagEngine(ans);
+    return { findings, total: totalSavingsRange(findings) };
+  }, [sector, revenue, salary, allFilled]);
+
   return (
-    <section className="relative hairline-b bg-canvas pb-16 pt-24 md:pt-32">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-14 md:grid-cols-12 md:gap-8">
-          <div className="md:col-span-7">
-            <p className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-eyebrow text-ink-muted">
-              <span className="inline-block h-px w-8 bg-ink-muted" />
-              Fiscaal platform voor DGA's
+    <section className="relative overflow-hidden bg-obsidian-900 pb-20 pt-28 md:pt-36">
+      {/* Subtiel emerald glow-licht aan de rechterkant — accent achter de dial. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(40% 50% at 75% 30%, rgba(62,207,148,0.06), transparent 70%)",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-6xl px-6">
+        <div className="grid items-start gap-14 md:grid-cols-12 md:gap-12">
+          {/* Linker kolom — copy + selects. */}
+          <div className="md:col-span-6 md:pt-6">
+            <p className="inline-flex items-center gap-3 font-mono text-[10px] uppercase tracking-stamp text-bone/45">
+              <span aria-hidden className="inline-block h-px w-8 bg-bone/30" />
+              Vault · fiscaal dossier voor DGA's
             </p>
-            <h1 className="mt-6 font-display text-display-xl text-ink text-balance">
-              Een kwantitatieve kijk op je fiscale positie — gebaseerd op de actuele wet&shy;geving.
+            <h1 className="mt-6 font-display text-display-xl text-bone text-balance etch">
+              Een kluis voor je fiscale positie. Eén dial, zes secties — en
+              alleen jij ziet wat erin zit.
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-ink-soft md:text-xl">
-              Fiscaalscherp is een onderzoeks&shy;platform dat de fiscale structuur van Nederlandse DGA's methodisch doorlicht. Je begint met drie velden — de engine doet de rest.
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-bone/65 md:text-xl">
+              Fiscaalscherp etst per sectie één arc op je persoonlijke kluis.
+              Begin met drie velden — de engine doet de rest.
             </p>
+
+            <div className="mt-10">
+              <MiniCalculator
+                sector={sector}
+                revenue={revenue}
+                salary={salary}
+                onSector={setSector}
+                onRevenue={setRevenue}
+                onSalary={setSalary}
+                findingsCount={result ? result.findings.length : null}
+              />
+            </div>
           </div>
 
-          <div className="md:col-span-5">
-            <MiniCalculator />
+          {/* Rechter kolom — de dial zelf. */}
+          <div className="md:col-span-6">
+            <div className="flex flex-col items-center gap-6">
+              <VaultDial
+                done={filled}
+                active={activeIndex}
+                min={result?.total.min ?? 0}
+                max={result?.total.max ?? 0}
+                size="lg"
+                label={allFilled ? "Optimalisatie · jaar" : "Kluis ontgrendelen"}
+                sublabel={
+                  allFilled
+                    ? "Indicatief · profielcombinatie"
+                    : `${filled} / 03 · etsen`
+                }
+              />
+              <p className="max-w-[300px] text-center font-mono text-[10px] uppercase tracking-stamp text-bone/35">
+                Elk veld etst één arc.
+                <br />
+                Drie etsen openen de dial.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="mt-16 grid gap-8 md:grid-cols-3">
-          <Feature
-            number="01"
+        {/* Drie principes onder de hero — rustig, geen kaarten meer. */}
+        <div className="mt-24 grid gap-10 border-t border-white/[0.06] pt-10 md:grid-cols-3">
+          <Principle
+            ordinal="I"
             title="Meetbare uitkomst"
             body="Elke bevinding komt met een indicatieve bandbreedte, een complexiteitsscore en een verwijzing naar de onderliggende regelgeving."
           />
-          <Feature
-            number="02"
+          <Principle
+            ordinal="II"
             title="Neutrale diagnose"
             body="De engine trekt geen conclusies voor je — hij legt de structuur bloot. Interpretatie en besluit blijven bij jou en je adviseur."
           />
-          <Feature
-            number="03"
-            title="Geen e-mailgate voor de eerste blik"
-            body="De mini-calculator werkt anoniem. Pas voor het volledige, persoonlijke rapport laat je contactgegevens achter."
+          <Principle
+            ordinal="III"
+            title="Geen e-mailgate"
+            body="De mini-dial werkt anoniem. Pas voor het volledige, persoonlijke rapport laat je contactgegevens achter."
           />
         </div>
       </div>
@@ -45,20 +127,28 @@ export function Hero() {
   );
 }
 
-function Feature({
-  number,
+function Principle({
+  ordinal,
   title,
   body,
 }: {
-  number: string;
+  ordinal: string;
   title: string;
   body: string;
 }) {
   return (
-    <div className="border-t border-line pt-5">
-      <p className="font-mono text-xs text-ink-subtle tabular-nums">{number}</p>
-      <h3 className="mt-2 font-display text-xl text-ink">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
+    <div className="flex gap-4">
+      <span
+        aria-hidden
+        className="font-display text-3xl leading-none text-emerald-300/85 etch-emerald"
+        style={{ letterSpacing: "0.04em" }}
+      >
+        {ordinal}
+      </span>
+      <div className="flex-1">
+        <h3 className="font-display text-xl text-bone etch">{title}</h3>
+        <p className="mt-2 text-[14px] leading-relaxed text-bone/60">{body}</p>
+      </div>
     </div>
   );
 }

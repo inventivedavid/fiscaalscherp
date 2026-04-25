@@ -1,7 +1,14 @@
 "use client";
 
+// VaultOpen — eindscherm. De volledige kluis is open.
+// Grote centrale dial met alle VI arcs geëtst. Reference-string als
+// gegraveerde regel onder de dial. Bevindingen onder de dial in een
+// rustig 2-koloms grid; verzegelde bevindingen tonen lock-glyphs in
+// plaats van redact-balken.
+
 import { useCockpit } from "./store";
 import { BarcodeID } from "./BarcodeID";
+import { VaultDial } from "./VaultDial";
 import { findSectionById } from "./sections";
 import type { Severity } from "@/lib/flags";
 
@@ -27,7 +34,6 @@ function severityLabel(s: Severity): string {
 }
 
 function caseRefFromAnswers(answers: Record<string, string>): string {
-  // Stabiele referentie — we hashen een paar vrijwel altijd ingevulde keys.
   const seed = `${answers.sector ?? "x"}-${answers.revenue ?? "x"}-${answers.dga_salary ?? "x"}-${answers.has_holding ?? "x"}`;
   let h = 0;
   for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
@@ -39,175 +45,190 @@ function caseRefFromAnswers(answers: Record<string, string>): string {
   return `FS-${year}-W${String(week).padStart(2, "0")}-${code}`;
 }
 
+function LockGlyph({ size = 14 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden
+      className="shrink-0 text-bone/40"
+    >
+      <rect
+        x="3.2"
+        y="7.2"
+        width="9.6"
+        height="6.6"
+        rx="1.4"
+        stroke="currentColor"
+        strokeWidth="1"
+      />
+      <path
+        d="M5.4 7.2 V5.4 a2.6 2.6 0 0 1 5.2 0 V7.2"
+        stroke="currentColor"
+        strokeWidth="1"
+        fill="none"
+      />
+      <circle cx="8" cy="10.5" r="0.9" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function DossierFinal() {
   const { findings, totalRange, gotoActivate, state } = useCockpit();
   const caseRef = caseRefFromAnswers(state.answers as Record<string, string>);
 
-  // Eerste twee findings tonen we open. De rest wordt op het eindscherm
-  // bewust deels verzegeld weergegeven — toegang tot de volledige
-  // uitwerking gebeurt via strateeg-activatie.
   const open = findings.slice(0, 2);
   const sealed = findings.slice(2);
 
   return (
     <div className="min-h-[100dvh] bg-obsidian-900 pt-safe">
-      <div className="classified-banner flex items-center justify-between px-4 py-1.5">
-        <span>Vertrouwelijk · Dossier compleet</span>
-        <span className="font-mono tabular-nums text-bone/55">VI/VI</span>
+      {/* Slim status-strip — kluis volledig open. */}
+      <div className="flex h-7 items-center justify-between border-b border-white/[0.05] bg-obsidian-900/80 px-4 font-mono text-[9.5px] uppercase tracking-stamp text-bone/45 backdrop-blur">
+        <span>Kluis · volledig open</span>
+        <span className="font-mono tabular-nums text-bone/45">VI / VI</span>
       </div>
 
-      <main className="mx-auto max-w-3xl px-5 pb-32 pt-10 md:px-6 md:pt-16">
-        <p className="font-mono text-[10px] tracking-stamp uppercase text-gold-300">
-          Dossier opgesteld · klaar voor strateeg
-        </p>
-        <h1 className="mt-4 font-display text-display-xl text-bone text-balance">
-          Je dossier is in beeld — een deel blijft verzegeld tot activatie.
-        </h1>
+      <main className="mx-auto max-w-3xl px-5 pb-32 pt-10 md:px-6 md:pt-14">
+        {/* Centrale dial. */}
+        <div className="flex flex-col items-center text-center">
+          <p className="font-mono text-[10px] uppercase tracking-stamp text-emerald-300 etch-emerald">
+            Dossier opgesteld · klaar voor strateeg
+          </p>
 
-        {/* Boarding-pass-achtige header */}
-        <div className="mt-10 glass relative overflow-hidden rounded-2xl">
-          <div className="grid grid-cols-1 gap-0 md:grid-cols-[1fr_auto]">
-            <div className="p-6 md:p-8">
-              <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/40">
-                Dossier-referentie
-              </p>
-              <p className="mt-1 font-mono text-lg tabular-nums text-bone">
-                {caseRef}
-              </p>
-
-              <div className="mt-6 grid grid-cols-2 gap-6">
-                <div>
-                  <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/40">
-                    Houder
-                  </p>
-                  <p className="mt-1 text-[14px] text-bone/80">
-                    {state.persistedEmail ? state.persistedEmail : "— in te vullen bij activatie"}
-                  </p>
-                </div>
-                <div>
-                  <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/40">
-                    Bedrijf
-                  </p>
-                  <p className="mt-1 text-[14px] text-bone/80">
-                    — in te vullen bij activatie
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-7 border-t border-white/8 pt-5">
-                <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/40">
-                  Optimalisatieruimte · jaarbasis · indicatief
-                </p>
-                <p
-                  className="mt-2 font-mono text-mono-stat text-emerald-400 tabular-nums"
-                  style={{ textShadow: "0 0 22px rgba(62,207,148,0.4)" }}
-                >
-                  {euro(totalRange.min)}{" "}
-                  <span className="text-bone/40">–</span>{" "}
-                  {euro(totalRange.max)}
-                </p>
-                <p className="mt-1 font-mono text-[11px] tracking-mark text-bone/40">
-                  Op basis van {findings.length} bevinding{findings.length === 1 ? "" : "en"}.
-                </p>
-              </div>
-            </div>
-
-            {/* Stempel-kolom */}
-            <div className="relative flex flex-col items-center justify-center gap-5 border-t border-white/8 px-6 py-6 md:border-l md:border-t-0 md:px-8">
-              <div className="stamp stamp-rotate inline-flex flex-col items-center gap-1 rounded-md px-3.5 py-2 font-mono text-[10px] tracking-stamp uppercase">
-                <span>Vastgelegd</span>
-                <span className="text-bone/55">VI / VI</span>
-              </div>
-              <BarcodeID seed={caseRef} bars={32} className="h-8" />
-            </div>
+          <div className="mt-8 animate-chamber-open">
+            <VaultDial
+              done={6}
+              active={null}
+              min={totalRange.min}
+              max={totalRange.max}
+              size="lg"
+              label="Optimalisatie · jaar"
+              sublabel="VI / VI · vastgelegd"
+            />
           </div>
+
+          {/* Gegraveerde reference + barcode-ets. */}
+          <div className="mt-10 flex flex-col items-center gap-2">
+            <p className="font-mono text-[10px] uppercase tracking-stamp text-bone/40">
+              Dossier-referentie
+            </p>
+            <p className="font-mono text-base tabular-nums text-bone etch md:text-lg">
+              {caseRef}
+            </p>
+            <BarcodeID
+              seed={caseRef}
+              bars={48}
+              className="mt-1 h-3 w-48 opacity-50"
+            />
+            <p className="mt-2 max-w-md font-mono text-[10px] uppercase tracking-stamp text-bone/35">
+              {state.persistedEmail
+                ? `houder · ${state.persistedEmail}`
+                : "houder · in te vullen bij activatie"}
+            </p>
+          </div>
+
+          <h1 className="mt-10 max-w-2xl font-display text-balance text-3xl text-bone etch md:text-5xl">
+            Je dossier is in beeld — een deel blijft verzegeld tot activatie.
+          </h1>
+          <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-bone/60">
+            Op basis van {findings.length} bevinding
+            {findings.length === 1 ? "" : "en"}. Het volledige rapport en de
+            concrete vervolgstappen worden ontsloten in het strateeg-gesprek.
+          </p>
         </div>
 
-        {/* Bevindingen — open + verzegeld */}
-        <section className="mt-10">
-          <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/45">
+        {/* Bevindingen — open. */}
+        <section className="mt-14">
+          <p className="font-mono text-[10px] uppercase tracking-stamp text-bone/45">
             Bevindingen — geprioriteerd
           </p>
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
             {open.map((f) => (
               <article
                 key={f.id}
-                className="glass rounded-2xl p-5 md:p-6"
+                className="brushed-deep ring-hairline rounded-2xl p-5 shadow-engrave md:p-6"
               >
                 <div className="flex items-baseline justify-between gap-3">
-                  <p className="font-mono text-[10px] tracking-stamp uppercase text-emerald-300">
+                  <p className="font-mono text-[10px] uppercase tracking-stamp text-emerald-300">
                     {severityLabel(f.severity)} · {f.shortLabel}
                   </p>
-                  <p className="font-mono text-[12px] tabular-nums text-emerald-400">
+                  <p className="font-mono text-[12px] tabular-nums text-emerald-400 etch-emerald">
                     {euro(f.savingsMinEur)} – {euro(f.savingsMaxEur)} / jr
                   </p>
                 </div>
-                <h3 className="mt-2 font-display text-xl text-bone md:text-2xl">
+                <h3 className="mt-2 font-display text-xl text-bone etch md:text-2xl">
                   {f.title}
                 </h3>
-                <p className="mt-3 text-[14px] leading-relaxed text-bone/70">
-                  {f.body.slice(0, 240)}
-                  {f.body.length > 240 ? "…" : ""}
+                <p className="mt-3 text-[14px] leading-relaxed text-bone/65">
+                  {f.body.slice(0, 220)}
+                  {f.body.length > 220 ? "…" : ""}
                 </p>
               </article>
             ))}
-
-            {sealed.length > 0 ? (
-              <div className="rounded-2xl border border-white/8 bg-white/[0.015] p-5 md:p-6">
-                <div className="flex items-baseline justify-between">
-                  <p className="font-mono text-[10px] tracking-stamp uppercase text-gold-300">
-                    Verzegeld · vereist strateeg
-                  </p>
-                  <p className="font-mono text-[10px] tabular-nums text-bone/40">
-                    {sealed.length} bevinding{sealed.length === 1 ? "" : "en"}
-                  </p>
-                </div>
-                <ul className="mt-4 space-y-2.5">
-                  {sealed.map((f) => (
-                    <li
-                      key={f.id}
-                      className="flex items-center gap-3"
-                    >
-                      <span className="redact h-3 w-32 max-w-[60%] flex-1" />
-                      <span className="font-mono text-[10px] tabular-nums text-bone/35">
-                        € ███ – € ███ / jr
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-4 text-[12px] leading-relaxed text-bone/45">
-                  Volledige titels, onderbouwing en concrete vervolgstappen
-                  worden ontsloten in het strateeg-gesprek.
-                </p>
-              </div>
-            ) : null}
           </div>
         </section>
 
-        {/* Sectie-overzicht */}
+        {/* Verzegeld blok. */}
+        {sealed.length > 0 ? (
+          <section className="mt-6">
+            <div className="brushed ring-hairline rounded-2xl p-5 shadow-engrave md:p-6">
+              <div className="flex items-baseline justify-between">
+                <p className="font-mono text-[10px] uppercase tracking-stamp text-bone/45">
+                  Verzegeld · vereist strateeg
+                </p>
+                <p className="font-mono text-[10px] tabular-nums text-bone/40">
+                  {sealed.length} bevinding{sealed.length === 1 ? "" : "en"}
+                </p>
+              </div>
+              <ul className="mt-4 space-y-2.5">
+                {sealed.map((f) => (
+                  <li key={f.id} className="flex items-center gap-3">
+                    <LockGlyph />
+                    <span
+                      aria-hidden
+                      className="h-px flex-1 bg-gradient-to-r from-white/15 via-white/5 to-transparent"
+                    />
+                    <span className="font-mono text-[10px] tabular-nums text-bone/35">
+                      € ███ – € ███ / jr
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-[12px] leading-relaxed text-bone/45">
+                Volledige titels, onderbouwing en concrete vervolgstappen
+                worden ontsloten in het strateeg-gesprek.
+              </p>
+            </div>
+          </section>
+        ) : null}
+
+        {/* Sectie-overzicht. */}
         <section className="mt-10">
-          <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/45">
+          <p className="font-mono text-[10px] uppercase tracking-stamp text-bone/45">
             Secties · vastgelegd
           </p>
-          <ol className="mt-4 grid gap-2">
+          <ol className="mt-4 grid gap-2 md:grid-cols-2">
             {state.completedSections.map((id) => {
               const s = findSectionById(id);
               return (
                 <li
                   key={id}
-                  className="flex items-center justify-between rounded-lg border border-white/8 bg-white/[0.015] px-4 py-2.5"
+                  className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.015] px-4 py-2.5"
                 >
                   <span className="flex items-center gap-3">
                     <span
                       aria-hidden
-                      className="seal-disc inline-flex h-6 w-6 items-center justify-center rounded-full font-mono text-[10px] text-gold-100"
+                      className="font-display text-[15px] leading-none text-emerald-300/90 etch-emerald"
+                      style={{ letterSpacing: "0.06em" }}
                     >
                       {s.ordinal}
                     </span>
                     <span className="text-[13px] text-bone/85">{s.title}</span>
                   </span>
-                  <span className="font-mono text-[10px] tracking-stamp uppercase text-gold-300">
-                    Vastgelegd
+                  <span className="font-mono text-[10px] uppercase tracking-stamp text-emerald-300/85">
+                    Geëtst
                   </span>
                 </li>
               );
@@ -216,30 +237,35 @@ export function DossierFinal() {
         </section>
       </main>
 
-      {/* Sticky activatie-CTA */}
-      <div className="fixed inset-x-0 bottom-0 z-30 bg-gradient-to-t from-obsidian-900 via-obsidian-900/95 to-transparent px-5 pb-safe pt-6">
+      {/* Sticky activatie-CTA. */}
+      <div className="brushed fixed inset-x-0 bottom-0 z-30 border-t border-white/[0.06] px-5 pb-safe pt-5 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.7)]">
         <div className="mx-auto flex max-w-3xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="hidden md:block">
-            <p className="font-mono text-[10px] tracking-stamp uppercase text-bone/40">
-              Volgende stap
+            <p className="font-mono text-[10px] uppercase tracking-stamp text-bone/40">
+              Volgende stap · kluis-toegang
             </p>
-            <p className="text-[13px] text-bone/70">
+            <p className="text-[13px] text-bone/65">
               Strateeg activeren · kennismakingsgesprek 15 min, vrijblijvend
             </p>
           </div>
           <button
             type="button"
             onClick={gotoActivate}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-4 text-[15px] font-medium text-obsidian-900 transition hover:bg-emerald-400 md:w-auto md:px-7"
+            className={[
+              "group inline-flex w-full items-center justify-center gap-3 rounded-2xl border py-4 text-[15px] font-medium transition md:w-auto md:px-7",
+              "border-emerald-400/60 bg-emerald-400/[0.10] text-bone",
+              "hover:border-emerald-400 hover:bg-emerald-400/[0.16]",
+              "shadow-[0_0_30px_-12px_rgba(62,207,148,0.6)]",
+            ].join(" ")}
           >
             Activeer mijn strateeg
-            <span aria-hidden>→</span>
+            <span aria-hidden className="transition group-hover:translate-x-0.5">
+              →
+            </span>
           </button>
         </div>
-        <p className="mx-auto mt-2 max-w-3xl text-center text-[11px] leading-relaxed text-bone/40 md:text-left">
-          Tijdens het gesprek bespreken we je dossier en of een
-          optimalisatiesessie (€ 495) zinvol is. Geen verplichting, geen
-          verkooppraatje — alleen jouw bevindingen in context.
+        <p className="mx-auto mt-2 max-w-3xl text-center font-mono text-[10px] uppercase tracking-stamp text-bone/35 md:text-left">
+          Geen verplichting · alleen jouw bevindingen in context
         </p>
       </div>
     </div>
